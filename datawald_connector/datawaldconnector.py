@@ -15,7 +15,7 @@ class DatawaldConnector(object):
         self.expires_time_ts = time.time()
         self.id_token = None
         self.encode = "utf-8"
-        self.except_keys = ["data", "entities"]
+        self.except_keys = ["data", "entities", "metadata"]
         self.headers = self.connect()
 
     @property
@@ -109,7 +109,9 @@ class DatawaldConnector(object):
         response = requests.post(
             request_url,
             headers=self.headers,
-            data=Utility.json_dumps({"query": query, "variables": variables}),
+            data=Utility.json_dumps({"query": query, "variables": variables}).encode(
+                "utf-8"
+            ),
             timeout=60,
             verify=True,
         )
@@ -350,17 +352,17 @@ class DatawaldConnector(object):
     def insert_product_metadata(self, **variables):
         query = """
             mutation insertProductMetadata(
-                    $target: String!,
+                    $targetSource: String!,
                     $column: String!,
                     $metadata: JSON!
                 ) {
                 insertProductMetadata(
-                    target: $target,
+                    targetSource: $targetSource,
                     column: $column,
                     metadata: $metadata
                 ) {
                     productMetadata{
-                        target
+                        targetSource
                         column
                         metadata
                         createdAt
@@ -379,17 +381,17 @@ class DatawaldConnector(object):
     def update_product_metadata(self, **variables):
         query = """
             mutation updateProductMetadata(
-                    $target: String!,
+                    $targetSource: String!,
                     $column: String!,
                     $metadata: JSON!
                 ) {
                 updateProductMetadata(
-                    target: $target,
+                    targetSource: $targetSource,
                     column: $column,
                     metadata: $metadata
                 ) {
                     productMetadata{
-                        target
+                        targetSource
                         column
                         metadata
                         createdAt
@@ -408,11 +410,11 @@ class DatawaldConnector(object):
     def delete_product_metadata(self, **variables):
         query = """
             mutation deleteProductMetadata(
-                    $target: String!,
+                    $targetSource: String!,
                     $column: String!
                 ) {
                 deleteProductMetadata(
-                    target: $target,
+                    targetSource: $targetSource,
                     column: $column
                 ) {
                     status
@@ -423,9 +425,9 @@ class DatawaldConnector(object):
 
     def get_product_metadatas(self, **variables):
         query = """
-            query($target: String!) {
-                productMetadatas(target: $target) {
-                    target
+            query($targetSource: String!) {
+                productMetadatas(targetSource: $targetSource) {
+                    targetSource
                     column
                     metadata
                     createdAt
