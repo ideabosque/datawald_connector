@@ -239,6 +239,7 @@ class DatawaldConnector(object):
     def insert_sync_task(self, **variables):
         query = """
             mutation insertSyncTask(
+                    $id: String,
                     $txType: String!,
                     $source: String!,
                     $target: String!,
@@ -248,6 +249,7 @@ class DatawaldConnector(object):
                     $funct: String!
                 ) {
                 insertSyncTask(
+                    id: $id,
                     txType: $txType,
                     source: $source,
                     target: $target,
